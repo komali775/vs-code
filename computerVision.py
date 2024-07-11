@@ -23,7 +23,10 @@ def runCV():
     data = response.read()
     result = False
     import json
-    data_1 = (json.loads(data)['tags'])
+    try:
+        data_1 = (json.loads(data)['tags'])
+    except:
+        return False
     for i in data_1:
         if 'ambulance' == i['name']:
             result = True

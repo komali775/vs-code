@@ -1,9 +1,9 @@
 import os
 
 import cv2
-import logic as logic
-from helper import *
-import computerVision
+import yolo.logic as logic
+from yolo.helper import *
+import yolo.computerVision as computerVision
 
 # load the COCO class labels our YOLO model was trained on
 labelsPath = os.path.sep.join([os.path.dirname(os.path.abspath(__file__)), "yolo-coco", "coco.names"])
@@ -64,10 +64,10 @@ def detectfinal(iter):
     imglist = []
     for i in range(2):
         imglist.append(
-            os.path.sep.join([os.path.dirname(os.path.abspath(__file__)), "frames", f'{i + 1}', f'{iter}' + '.jpg']))
+            os.path.sep.join([os.path.dirname(os.path.abspath(__file__)), "frames", f'{i + 1}', f'{iter + 10}' + '.jpg']))
         imglist.append(
             os.path.sep.join(
-                [os.path.dirname(os.path.abspath(__file__)), "frames", f'{i + 3}', f'{iter + 350}' + '.jpg']))
+                [os.path.dirname(os.path.abspath(__file__)), "frames", f'{i + 3}', f'{iter + 360}' + '.jpg']))
     finalList = detectFour(imglist)
 
     return logic.conclusion(finalList)
@@ -142,7 +142,7 @@ def show_result(layerOutputs, confidence, threshold, image):
     return len(ann)
 
 
-print(detectfinal(1))
+# print(detectfinal(0))
 # getFrameHelper(os.path.sep.join([os.path.dirname(os.path.abspath(__file__)), "videos_raw", "3.mp4"]))
 
 # detect('images/1.jpg')

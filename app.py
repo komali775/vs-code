@@ -1,47 +1,31 @@
-from flask import Flask
-import random
-import requests
-import datetime
-import time
-import json
-from yolo.logic import time_update
+from flask import Flask, render_template, request, send_from_directory
+from yolo import *
 
 app = Flask(__name__)
 
-api_key = 'up87un4nhriz1agk873vtsjwppy47hgd'
+UPLOAD_FOLDER = os.path.basename('uploads')
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-url1 = f'http://apis.mapmyindia.com/advancedmaps/v1/{api_key}/distance?center=12.921288,77.668916%7C&pts=12.922310,77.668916'
-url2 = f'http://apis.mapmyindia.com/advancedmaps/v1/{api_key}/distance?center=12.922310,77.668916%7C&pts=12.922610,77.669872'
-url3 = f'http://apis.mapmyindia.com/advancedmaps/v1/{api_key}/distance?center=12.922610,77.669872%7C&pts=12.923450,77.671286'
-url4 = f'http://apis.mapmyindia.com/advancedmaps/v1/{api_key}/distance?center=12.923450,77.671286%7C&pts=12.925450,77.671286'
-url5 = f'http://apis.mapmyindia.com/advancedmaps/v1/{api_key}/distance?center=12.925450,77.671286%7C&pts=12.924118,77.673142'
 
-@app.route('/api')
-def api():
-    while(True):
-        severity = random.random()
+@app.route('/')
+def hello_world():
+    return render_template('index.html')
 
-        body = requests.get(url1)
-        body = json.loads(body.text)
-        time_update(int(int(body["results"][0]["duration"])/7), severity)
-        time.sleep(int(int(body["results"][0]["duration"])/7))
-        body = requests.get(url2)
-        body = json.loads(body.text)
-        time_update(int(int(body["results"][0]["duration"])/7), severity)
-        time.sleep(int(int(body["results"][0]["duration"])/7))
-        body = requests.get(url3)
-        body = json.loads(body.text)
-        time_update(int(int(body["results"][0]["duration"])/7), severity)
-        time.sleep(int(int(body["results"][0]["duration"])/7))
-        body = requests.get(url4)
-        body = json.loads(body.text)
-        time_update(int(int(body["results"][0]["duration"])/7), severity)
-        time.sleep(int(int(body["results"][0]["duration"])/7))
-        body = requests.get(url5)
-        body = json.loads(body.text)
-        time_update(int(int(body["results"][0]["duration"])/7), severity)
-        time.sleep(int(int(body["results"][0]["duration"])/7))
-    return 'hello world'
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    file = request.files['image']
+    f = os.path.join(os.path.dirname(os.path.abspath(__file__)), app.config['UPLOAD_FOLDER'], file.filename)
+    file.save(f)
+    density = detect(f)
+    return render_template('download.html', variable=density)
+
+
+
+@app.route('/return-files')
+def return_files_tut():
+    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), 'result.png', as_attachment=True)
+
 
 if __name__ == "__main__":
-    app.run(host='127.0.0.1', port=4000)
+    app.run()
